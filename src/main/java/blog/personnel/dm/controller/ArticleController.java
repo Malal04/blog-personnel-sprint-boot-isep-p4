@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin("*")
 @RequestMapping("/api/v1/posts")
 public class ArticleController {
     @Autowired
@@ -49,7 +48,7 @@ public class ArticleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getArticleById(@PathVariable Integer id, @RequestHeader("UserId") Integer userId) {
+    public ResponseEntity<?> getArticleById(@PathVariable Integer id, @RequestHeader("userId") Integer userId) {
         try {
             Optional<Article> article = articleService.getArticleById(id, userId);
             return article.map(ResponseEntity::ok)

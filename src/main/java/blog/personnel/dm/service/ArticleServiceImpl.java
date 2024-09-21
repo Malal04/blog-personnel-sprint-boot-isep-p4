@@ -23,6 +23,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
     private AmitieRepository    amitieRepository;
+
     @Autowired
     private UserRepository userRepository;
 
@@ -60,6 +61,9 @@ public class ArticleServiceImpl implements ArticleService {
         article.setContenu(articleDto.getContenu());
         article.setEstPublic(articleDto.isEstPublic());
         article.setAllowComments(articleDto.isAllowComments());
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        article.setUser(user);
         articleRepository.save(article);
     }
 

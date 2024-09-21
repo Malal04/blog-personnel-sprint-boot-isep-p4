@@ -16,7 +16,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@Validated
 public class AuthController{
 
     @Autowired

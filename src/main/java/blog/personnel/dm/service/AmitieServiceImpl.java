@@ -20,19 +20,15 @@ public class AmitieServiceImpl implements AmitieService {
     @Autowired
     private UserRepository userRepository;
 
-
     public void demandeAmitie(Integer userId, Integer amiId) {
         if (userId.equals(amiId)) {
             throw new IllegalArgumentException("Vous ne pouvez pas vous ajouter vous-même.");
         }
-
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Utilisateur non trouvé."));
         User ami = userRepository.findById(amiId).orElseThrow(() -> new RuntimeException("Ami non trouvé."));
-
         if (amitieRepository.existsByUserAndAmi(user, ami)) {
             throw new IllegalStateException("Demande d'amitié déjà existante.");
         }
-
         Amitie amitie = new Amitie();
         amitie.setUser(user);
         amitie.setAmi(ami);
@@ -74,6 +70,10 @@ public class AmitieServiceImpl implements AmitieService {
             throw new RuntimeException("Relation d'amitié non trouvée.");
         }
         amitieRepository.delete(amitie);
+    }
+
+    public List<Amitie> getDemandesAmitie(Integer userId) {
+        return amitieRepository.findDemandesAmitie(userId, Statut.EN_ATTENTE);
     }
 
 }

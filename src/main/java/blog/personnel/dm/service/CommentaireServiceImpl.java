@@ -8,7 +8,11 @@ import blog.personnel.dm.repository.CommentaireRepository;
 import blog.personnel.dm.repository.UserRepository;
 import blog.personnel.dm.service.inter.CommentaireService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CommentaireServiceImpl implements CommentaireService {
@@ -22,44 +26,31 @@ public class CommentaireServiceImpl implements CommentaireService {
     @Autowired
     private UserRepository userRepository;
 
-    public Commentaire addCommentaire(Commentaire commentaire) {
-
-        if (commentaire.getContenu() == null || commentaire.getContenu().trim().isEmpty()) {
-            throw new IllegalArgumentException("Le contenu du commentaire ne peut pas être vide.");
-        }
-
-        if (commentaire.getArticle() == null || commentaire.getUser() == null) {
-            throw new IllegalArgumentException("Le commentaire doit être associé à un utilisateur et un article.");
-        }
-
-         articleRepository.findById(commentaire.getArticle().getId())
-                .orElseThrow(() -> new IllegalArgumentException("L'article associé au commentaire n'existe pas."));
-
-         userRepository.findById(commentaire.getUser().getId())
-                .orElseThrow(() -> new IllegalArgumentException("L'utilisateur associé au commentaire n'existe pas."));
-
-
-        String contenuNormalise = commentaire.getContenu().trim();
-        commentaire.setContenu(contenuNormalise);
-
+    public Commentaire addCommentaire(Integer articleId, Integer userId, String contenu) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new RuntimeException("Article non trouvé."));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé."));
+        Commentaire commentaire = new Commentaire();
+        commentaire.setArticle(article);
+        commentaire.setUser(user);
+        commentaire.setContenu(contenu);
         return commentaireRepository.save(commentaire);
     }
-
-    public void deleteCommentaire(Integer id, Integer userId) {
-        Commentaire commentaire = commentaireRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Commentaire non trouvé"));
-
-        userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
-
-        User commentaireUser = commentaire.getUser();
-        User articleOwner = commentaire.getArticle().getUser();
-
-        if (!commentaireUser.getId().equals(userId) && !articleOwner.getId().equals(userId)) {
-            throw new SecurityException("Vous n'avez pas la permission de supprimer ce commentaire.");
+    public void deleteCommentaire(Integer commentaireId, Integer userId,Integer articleId) {
+        Commentaire commentaire = commentaireRepository.findById(commentaireId)
+                .orElseThrow(() -> new RuntimeException("Commentaire non trouvé."));
+        if (!commentaire.getArticle().getId().equals(articleId)) {
+            throw new RuntimeException("Ce commentaire ne fait pas partie de cet article.");
         }
+        if (!commentaire.getUser().getId().equals(userId) && !commentaire.getArticle().getUser().getId().equals(userId)) {
+            throw new RuntimeException("Vous n'avez pas l'autorisation de supprimer ce commentaire.");
+        }
+        commentaireRepository.delete(commentaire);
+    }
 
-        commentaireRepository.deleteById(id);
+    public List<Commentaire> getCommentairesForArticle(Integer articleId) {
+        return commentaireRepository.findByArticleId(articleId);
     }
 
 }

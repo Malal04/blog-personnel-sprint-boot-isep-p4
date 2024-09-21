@@ -1,5 +1,6 @@
 package blog.personnel.dm.service.inter;
 
+import blog.personnel.dm.entity.Amitie;
 import blog.personnel.dm.entity.User;
 
 import java.util.List;
@@ -17,5 +18,7 @@ public interface AmitieService {
     void blockAmie(Integer userId, Integer amiId);
 
     void unAmie(Integer userId, Integer amiId);
+
+    List<Amitie> getDemandesAmitie(Integer userId);
 
 }

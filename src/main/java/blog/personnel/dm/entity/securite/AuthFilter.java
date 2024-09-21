@@ -26,18 +26,22 @@ public class AuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authorizationHeader = request.getHeader("Authorization");
 
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer")) {
             String token = authorizationHeader.substring(7);
-
             Optional<Auth> authenticationRes = authService.findByToken(token);
+
             if (authenticationRes.isPresent()) {
                 Auth auth = authenticationRes.get();
                 String user = auth.getUser().getUserNom();
                 var authentication = new UsernamePasswordAuthenticationToken(user, null, List.of());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                System.out.println("Authentication successful for user: " + user);
+            } else {
+                System.out.println("Authentication failed for token: " + token);
             }
+        } else {
+            System.out.println("No authorization header found.");
         }
         filterChain.doFilter(request, response);
     }
-
 }

@@ -53,7 +53,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public String hashPassword(String pwd){
-        //les messages digest : MD5 , SHA-512 ,
         String prefix = "@1JgT0)";
         String suffix = "Ge5t!*T";
         String newPwd = prefix + pwd + suffix;

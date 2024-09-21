@@ -1,5 +1,6 @@
 package blog.personnel.dm.controller;
 
+import blog.personnel.dm.entity.Amitie;
 import blog.personnel.dm.entity.User;
 import blog.personnel.dm.service.inter.AmitieService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,18 @@ public class AmitieController {
     @Autowired
     private AmitieService amitieService;
 
+    @GetMapping("/deman")
+    public ResponseEntity<List<Amitie>> getDemandes(@RequestParam("userId") Integer userId) {
+        try {
+            List<Amitie> demandes = amitieService.getDemandesAmitie(userId);
+            return ResponseEntity.ok(demandes);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ArrayList<>());
+        }
+    }
+
     @PostMapping("/demandes")
-    public ResponseEntity<?> demandeAmitie(@RequestParam("userId") Integer userId, @RequestParam("amitieId") Integer amiId){
+    public ResponseEntity<?> demandeAmitie(@RequestParam("userId") Integer userId, @RequestParam("amiId") Integer amiId){
         try {
             amitieService.demandeAmitie(userId, amiId);
             return ResponseEntity.ok("Demande envoyée.");

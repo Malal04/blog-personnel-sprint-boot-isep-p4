@@ -25,5 +25,4 @@ public class LogFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
 
     }
-
 }

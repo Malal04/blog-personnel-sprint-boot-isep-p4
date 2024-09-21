@@ -3,38 +3,55 @@ package blog.personnel.dm.controller;
 import blog.personnel.dm.entity.Commentaire;
 import blog.personnel.dm.service.inter.CommentaireService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/v1/comments")
+@RequestMapping("/api/articles/{articleId}/commentaires")
 public class CommentaireController {
     @Autowired
     private CommentaireService commentaireService;
 
     @PostMapping
-    public ResponseEntity<?> addCommentaire(@RequestBody Commentaire commentaire) {
+    public ResponseEntity<Commentaire> addCommentaire(
+            @PathVariable Integer articleId,
+            @RequestParam Integer userId,
+            @RequestParam String contenu) {
         try {
-            Commentaire createdCommentaire = commentaireService.addCommentaire(commentaire);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdCommentaire);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Une erreur s'est produite lors de la création du commentaire.");
+            Commentaire commentaire = commentaireService.addCommentaire(articleId, userId, contenu);
+            return ResponseEntity.ok(commentaire);
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+    }
+
+    @DeleteMapping("/{commentaireId}")
+    public ResponseEntity<Void> deleteCommentaire(
+            @PathVariable Integer articleId,
+            @PathVariable Integer commentaireId,
+            @RequestParam Integer userId) {
+        try {
+            commentaireService.deleteCommentaire(commentaireId, userId, articleId);
+            return ResponseEntity.noContent().build();
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCommentaire(@PathVariable Integer id, @RequestHeader("UserId") Integer userId) {
+    @GetMapping
+    public ResponseEntity<List<Commentaire>> getCommentaires(@PathVariable Integer articleId) {
         try {
-            commentaireService.deleteCommentaire(id, userId);
-            return ResponseEntity.ok("Commentaire supprimé avec succès.");
-        } catch (SecurityException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Une erreur s'est produite lors de la suppression du commentaire.");
+            List<Commentaire> commentaires = commentaireService.getCommentairesForArticle(articleId);
+            return ResponseEntity.ok(commentaires);
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
         }
     }
+
 }
-

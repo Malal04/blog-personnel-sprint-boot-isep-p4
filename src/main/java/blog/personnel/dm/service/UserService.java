@@ -14,7 +14,6 @@ public class UserService {
     private UserRepository userRepository;
 
     public List<User> searchByUserNom(String userNom) {
-
         return userRepository.findByUserNomContaining(userNom);
     }
 

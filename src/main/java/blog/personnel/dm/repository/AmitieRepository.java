@@ -12,6 +12,9 @@ import java.util.List;
 @Repository
 public interface AmitieRepository extends JpaRepository<Amitie, Integer> {
 
+    @Query("SELECT a FROM Amitie a WHERE a.ami.id = :userId AND a.statut = :statut")
+    List<Amitie> findDemandesAmitie(Integer userId, Statut statut);
+
     @Query("SELECT a.ami.id FROM Amitie a WHERE a.user.id = :userId AND a.statut = :statut")
     public List<Integer> findUserByStatus(Integer userId, Statut statut);
 
